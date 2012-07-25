@@ -25,7 +25,7 @@ package canvas
 
 /*
 #cgo LDFLAGS: -lMagickWand -lMagickCore
-#cgo CFLAGS: -fopenmp -I/usr/include/ImageMagick  
+#cgo CFLAGS: -fopenmp -I/usr/include/ImageMagick
 
 #include <wand/magick_wand.h>
 
@@ -98,7 +98,7 @@ func getPixelHexColor(p *C.PixelWand) string {
 	return fmt.Sprintf("#%02x%02x%02x", int(rgb[0]*255.0), int(rgb[1]*255.0), int(rgb[2]*255.0))
 }
 
-// Private: returns MagickTrue or MagickFalse 
+// Private: returns MagickTrue or MagickFalse
 func magickBoolean(value bool) C.MagickBooleanType {
 	if value == true {
 		return C.MagickTrue
@@ -171,8 +171,8 @@ func (cv Canvas) AutoOrientate() bool {
 
 // Returns all metadata keys from the currently loaded image.
 func (cv Canvas) Metadata() map[string]string {
-	var n C.size_t
-	var i C.size_t
+	var n C.ulong
+	var i C.ulong
 
 	var value *C.char
 	var key *C.char
@@ -182,7 +182,7 @@ func (cv Canvas) Metadata() map[string]string {
 	properties := C.MagickGetImageProperties(cv.wand, C.CString("*"), &n)
 
 	for i = 0; i < n; i++ {
-		key = C.MagickGetPropertyName(properties, i)
+		key = C.MagickGetPropertyName(properties, C.size_t(i))
 		value = C.MagickGetImageProperty(cv.wand, key)
 
 		data[strings.Trim(C.GoString(key), " ")] = strings.Trim(C.GoString(value), " ")
@@ -259,7 +259,7 @@ func (cv Canvas) Thumbnail(width uint, height uint) bool {
 
 // Puts a canvas on top of the current one.
 func (cv Canvas) AppendCanvas(source Canvas, x int, y int) bool {
-	status := C.MagickCompositeImage(cv.wand, source.wand, C.OverCompositeOp, C.ssize_t(x), C.ssize_t(y))
+	status := C.MagickCompositeImage(cv.wand, source.wand, C.OverCompositeOp, C.long(x), C.long(y))
 	if status == C.MagickFalse {
 		return false
 	}
@@ -293,7 +293,7 @@ func (cv Canvas) Write(filename string) bool {
 
 // Changes the size of the canvas, returns true on success.
 func (cv Canvas) Resize(width uint, height uint) bool {
-	status := C.MagickResizeImage(cv.wand, C.size_t(width), C.size_t(height), C.GaussianFilter, C.double(1.0))
+	status := C.MagickResizeImage(cv.wand, C.ulong(width), C.ulong(height), C.GaussianFilter, C.double(1.0))
 	if status == C.MagickFalse {
 		return false
 	}
@@ -302,7 +302,7 @@ func (cv Canvas) Resize(width uint, height uint) bool {
 
 // Adaptively changes the size of the canvas, returns true on success.
 func (cv Canvas) AdaptiveResize(width uint, height uint) bool {
-	status := C.MagickAdaptiveResizeImage(cv.wand, C.size_t(width), C.size_t(height))
+	status := C.MagickAdaptiveResizeImage(cv.wand, C.ulong(width), C.ulong(height))
 	if status == C.MagickFalse {
 		return false
 	}
@@ -311,7 +311,7 @@ func (cv Canvas) AdaptiveResize(width uint, height uint) bool {
 
 // Changes the compression quality of the canvas. Ranges from 1 (lowest) to 100 (highest).
 func (cv Canvas) SetQuality(quality uint) bool {
-	status := C.MagickSetImageCompressionQuality(cv.wand, C.size_t(quality))
+	status := C.MagickSetImageCompressionQuality(cv.wand, C.ulong(quality))
 	if status == C.MagickFalse {
 		return false
 	}
@@ -507,7 +507,7 @@ func (cv Canvas) Destroy() {
 
 // Creates an empty canvas of the given dimensions.
 func (cv Canvas) Blank(width uint, height uint) bool {
-	status := C.MagickNewImage(cv.wand, C.size_t(width), C.size_t(height), cv.bg)
+	status := C.MagickNewImage(cv.wand, C.ulong(width), C.ulong(height), cv.bg)
 	if status == C.MagickFalse {
 		return false
 	}
@@ -543,7 +543,7 @@ func (cv Canvas) AddNoise() bool {
 
 // Removes a region of a canvas and collapses the canvas to occupy the removed portion.
 func (cv Canvas) Chop(x int, y int, width uint, height uint) bool {
-	status := C.MagickChopImage(cv.wand, C.size_t(width), C.size_t(height), C.ssize_t(x), C.ssize_t(y))
+	status := C.MagickChopImage(cv.wand, C.ulong(width), C.ulong(height), C.long(x), C.long(y))
 	if status == C.MagickFalse {
 		return false
 	}
@@ -552,7 +552,7 @@ func (cv Canvas) Chop(x int, y int, width uint, height uint) bool {
 
 // Extracts a region from the canvas.
 func (cv Canvas) Crop(x int, y int, width uint, height uint) bool {
-	status := C.MagickCropImage(cv.wand, C.size_t(width), C.size_t(height), C.ssize_t(x), C.ssize_t(y))
+	status := C.MagickCropImage(cv.wand, C.ulong(width), C.ulong(height), C.long(x), C.long(y))
 	if status == C.MagickFalse {
 		return false
 	}
