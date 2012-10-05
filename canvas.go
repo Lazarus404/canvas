@@ -194,6 +194,11 @@ func (cv Canvas) Metadata() map[string]string {
 	return data
 }
 
+func (cv Canvas) Format() string {
+    format := C.MagickGetImageFormat(cv.wand)
+    return strings.Trim(C.GoString(format), " ")
+}
+
 // Associates a metadata key with its value.
 func (cv Canvas) SetMetadata(key string, value string) {
 	C.MagickSetImageProperty(cv.wand, C.CString(key), C.CString(value))
