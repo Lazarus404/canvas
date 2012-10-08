@@ -121,6 +121,16 @@ func (cv Canvas) Open(filename string) bool {
 	return true
 }
 
+// Opens an image from binary, returns true on success.
+func (cv Canvas) OpenBlob(data []byte) bool {
+	cv.filename = ""
+	status := C.MagickReadImageBlob(cv.wand, unsafe.Pointer(&data[0]), C.size_t(len(data)))
+	if status == C.MagickFalse {
+		return false
+	}
+	return true
+}
+
 // Auto-orientates canvas based on its original image's EXIF metadata
 func (cv Canvas) AutoOrientate() bool {
 
@@ -192,6 +202,11 @@ func (cv Canvas) Metadata() map[string]string {
 	}
 
 	return data
+}
+
+func (cv Canvas) Format() string {
+    format := C.MagickGetImageFormat(cv.wand)
+    return strings.Trim(C.GoString(format), " ")
 }
 
 // Associates a metadata key with its value.
