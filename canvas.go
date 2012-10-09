@@ -306,6 +306,16 @@ func (cv Canvas) Write(filename string) bool {
 	return true
 }
 
+// Writes canvas to a file, returns true on success.
+func (cv Canvas) GetImageBlob() []byte {
+	cv.Update()
+    var length C.size_t
+	data := C.MagickGetImageBlob(cv.wand, &length)
+    bin := C.GoBytes(unsafe.Pointer(data), C.int(length))
+    C.MagickRelinquishMemory(unsafe.Pointer(data))
+    return bin
+}
+
 // Changes the size of the canvas, returns true on success.
 func (cv Canvas) Resize(width uint, height uint) bool {
 	status := C.MagickResizeImage(cv.wand, C.ulong(width), C.ulong(height), C.GaussianFilter, C.double(1.0))

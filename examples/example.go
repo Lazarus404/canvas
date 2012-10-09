@@ -9,7 +9,7 @@ func main() {
 	cv := canvas.New()
 	defer cv.Destroy()
 
-    file, err := os.Open("input/example.jpg")
+    file, err := os.Open("input/example.png")
     if err != nil {
         log.Println("Open file failed")
         return
@@ -41,8 +41,15 @@ func main() {
 		// Creating a squared thumbnail
 		cv.Thumbnail(100, 100)
 
+        bin := cv.GetImageBlob()
+        tf, err := os.Create("output/example_read_from_mem.png")
+        if err != nil {
+            log.Println("create file failed")
+            return
+        }
+        tf.Write(bin)
 		// Saving the thumbnail to disk.
-		cv.Write("output/example-thumbnail_2012.png")
+		//cv.Write("output/example-thumbnail_2012.png")
         log.Println("The format is", cv.Format())
 	} else {
         log.Println("Open failed")
