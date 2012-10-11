@@ -9,7 +9,7 @@ func main() {
 	cv := canvas.New()
 	defer cv.Destroy()
 
-    file, err := os.Open("input/example.jpg")
+    file, err := os.Open("input/example.png")
     if err != nil {
         log.Println("Open file failed")
         return
