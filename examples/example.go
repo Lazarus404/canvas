@@ -39,11 +39,22 @@ func main() {
 		//cv.AutoOrientate()
 
 		// Creating a squared thumbnail
-		cv.Thumbnail(100, 100)
+        var i uint;
+        for i = 1; i< 3; i++ {
+            cv.Thumbnail(i*50, i*50)
 
-		// Saving the thumbnail to disk.
-		cv.Write("output/example-thumbnail_2012.png")
-        log.Println("The format is", cv.Format())
+            bin := cv.GetImageBlob()
+            tf, err := os.Create("output/example_read_from_mem_100_100.png")
+            defer tf.Close()
+            if err != nil {
+                log.Println("create file failed")
+                return
+            }
+            tf.Write(bin)
+            // Saving the thumbnail to disk.
+            //cv.Write("output/example-thumbnail_2012.png")
+            log.Println("The format is", cv.Format())
+        }
 	} else {
         log.Println("Open failed")
     }
