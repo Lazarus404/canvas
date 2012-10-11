@@ -24,8 +24,8 @@
 package canvas
 
 /*
-#cgo LDFLAGS: -lMagickWand -lMagickCore
-#cgo CFLAGS: -fopenmp -I/usr/include/ImageMagick  
+#cgo LDFLAGS: -lMagickWand -lMagickCore -L/usr/local/lib
+#cgo CFLAGS: -fopenmp -I/usr/local/include/ImageMagick
 
 #include <wand/magick_wand.h>
 
@@ -304,6 +304,16 @@ func (cv Canvas) Write(filename string) bool {
 		return false
 	}
 	return true
+}
+
+// Writes canvas to a file, returns true on success.
+func (cv Canvas) GetImageBlob() []byte {
+    cv.Update()
+    var length C.size_t
+    data := C.MagickGetImageBlob(cv.wand, &length)
+    bin := C.GoBytes(unsafe.Pointer(data), C.int(length))
+    C.MagickRelinquishMemory(unsafe.Pointer(data))
+    return bin
 }
 
 // Changes the size of the canvas, returns true on success.
