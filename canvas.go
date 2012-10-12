@@ -204,6 +204,14 @@ func (cv Canvas) Metadata() map[string]string {
 	return data
 }
 
+func (cv Canvas) SetImageFormat(format string) bool {
+    if C.MagickSetImageFormat(cv.wand, C.CString(format)) == C.MagickFalse {
+        return false
+    }
+
+    return true
+}
+
 func (cv Canvas) Format() string {
     format := C.MagickGetImageFormat(cv.wand)
     return strings.Trim(C.GoString(format), " ")
@@ -232,6 +240,12 @@ func (cv Canvas) Flip() bool {
 	return true
 }
 
+func (cv Canvas) Clone() *Canvas {
+    copies := New()
+    copies.wand = C.CloneMagickWand(cv.wand)
+    return copies
+}
+
 // Creates a centered thumbnail of the canvas.
 func (cv Canvas) Thumbnail(width uint, height uint) bool {
 
@@ -242,7 +256,7 @@ func (cv Canvas) Thumbnail(width uint, height uint) bool {
 	ratio = math.Min(float64(cv.Width())/float64(width), float64(cv.Height())/float64(height))
 
 	if ratio < 1.0 {
-		// Origin image is smaller than the thumbnail image.
+		/*// Origin image is smaller than the thumbnail image.
 		max := uint(math.Max(float64(width), float64(height)))
 
 		// Empty replacement buffer with transparent background.
@@ -258,8 +272,8 @@ func (cv Canvas) Thumbnail(width uint, height uint) bool {
 		// Replacing wand
 		C.DestroyMagickWand(cv.wand)
 
-		cv.wand = C.CloneMagickWand(replacement.wand)
-
+		cv.wand = C.CloneMagickWand(replacement.wand)*/
+		cv.Resize(uint(float64(cv.Width())/ratio), uint(float64(cv.Height())/ratio))
 	} else {
 		// Is bigger, just resizing.
 		cv.Resize(uint(float64(cv.Width())/ratio), uint(float64(cv.Height())/ratio))
