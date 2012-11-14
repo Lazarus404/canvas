@@ -288,6 +288,43 @@ func (cv *Canvas) Thumbnail(width uint, height uint) bool {
 
 }
 
+func (cv *Canvas) RawThumbnail(size uint) bool {
+
+	var ratio float64
+
+    width, height := size, size
+
+	// Normalizing image.
+
+	ratio = math.Max(float64(cv.Width())/float64(width), float64(cv.Height())/float64(height))
+
+	if width < cv.Width() || height < cv.Height() {
+		/*// Origin image is smaller than the thumbnail image.
+		max := uint(math.Max(float64(width), float64(height)))
+
+		// Empty replacement buffer with transparent background.
+		replacement := New()
+
+		replacement.SetBackgroundColor("none")
+
+		replacement.Blank(max, max)
+
+		// Putting original image in the center of the replacement canvas.
+		replacement.AppendCanvas(cv, int(int(width-cv.Width())/2), int(int(height-cv.Height())/2))
+
+		// Replacing wand
+		C.DestroyMagickWand(cv.wand)
+
+		cv.wand = C.CloneMagickWand(replacement.wand)*/
+		cv.Resize(uint(float64(cv.Width())/ratio), uint(float64(cv.Height())/ratio))
+	}
+	// Now we have an image that we can use to crop the thumbnail from.
+	//cv.Crop(int(int(cv.Width()-width)/2), int(int(cv.Height()-height)/2), width, height)
+
+	return true
+
+}
+
 // Puts a canvas on top of the current one.
 func (cv *Canvas) AppendCanvas(source Canvas, x int, y int) bool {
 	status := C.MagickCompositeImage(cv.wand, source.wand, C.OverCompositeOp, C.ssize_t(x), C.ssize_t(y))
